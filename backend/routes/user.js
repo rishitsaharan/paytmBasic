@@ -4,7 +4,7 @@ const zod = require("zod");
 const jwt = require("jsonwebtoken");
 const { User } = require("../db/index");
 const { JWT_SECRET } = require("../config");
-
+const authMiddleware = require("../middlewares/middleware");
 
 Router.get("/", (req, res) => {
     res.json({
@@ -21,7 +21,7 @@ Router.post("/signup", async (req, res) => {
         firstName : zod.string().min(3),
         lastName : zod.string()
     });
-    const {success} = userSchema.parse(req.body);
+    const {success} = userSchema.safeParse(req.body);
     if(!success){    
         return res.status(411).json({
             message : "incorrect Inputs"
@@ -58,14 +58,14 @@ Router.post("/signin", async (req, res) => {
         username : zod.string().email(),
         password : zod.string().min(6),
     });
-    const {success} = userSchema.parse(req.body);
-    if(!success){    
+    const {success} = userSchema.safeParse(req.body);
+    if(!success){
         return res.status(411).json({
             message : "incorrect Inputs"
         });
     }
 
-    const existingUser = User.findOne({
+    const existingUser = await User.findOne({
         username : username,
         password : password
     });
@@ -83,4 +83,44 @@ Router.post("/signin", async (req, res) => {
         })
     }
 });
+
+Router.post("/", authMiddleware, async (req, res) => {
+    const userSchema = zod.object({
+        password : zod.string().min(6).optional(),
+        firstName : zod.string().min(3).optional(),
+        lastName : zod.string().optional()
+    })
+    const {success} = userSchema.safeParse(req.body);
+    if(!success){
+        res.status(411).json({
+            message : "Error while updating information"
+        })
+    }
+    const userId = req.userId;
+    const updatedUser = await User.findOneAndUpdate({
+        _id : userId
+    }, req.body);
+    res.status(200).json({
+        message : "updated successfully"
+    })
+});
+
+Router.post("/bulk", async(req, res) => {
+    const name = req.query.filter || "";
+    const users = await User.find({
+        $or : [{
+            firstName : new RegExp(name, 'i')
+        }, {
+            lastName : new RegExp(name, 'i')
+        }]
+    });
+    res.json({
+        user : users.map(user => ({
+            username : user.username,
+            firstName : user.firstName,
+            lastName : user.lastName,
+            _id : user._id
+        }))
+    })
+})
 module.exports = Router;
