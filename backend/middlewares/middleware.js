@@ -9,6 +9,7 @@ const authMiddleware = (req, res, next) => {
         });
     }
     token = token.split(" ")[1];
+    console.log(token);
     try{
         const decodedValue = jwt.verify(token, JWT_SECRET);
         req.userId = decodedValue.userId;
