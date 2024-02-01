@@ -76,13 +76,13 @@ Router.post("/signin", async (req, res) => {
     if(existingUser){
         const userId = existingUser._id;
         const jwtToken = jwt.sign({userId : userId}, JWT_SECRET);
-        res.status(200).json({
+        return res.status(200).json({
             message : "User signed in",
             token : jwtToken
         });
     }
     else{
-        res.status(411).json({
+        return res.status(411).json({
             message: "Error while logging in"
         })
     }

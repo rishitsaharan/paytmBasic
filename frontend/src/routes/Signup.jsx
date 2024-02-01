@@ -36,7 +36,7 @@ export const Signup = () => {
           <h6 className="text-gray-500">Enter your information to create your account</h6>
         </div>
         <input
-          className= "mb-4 px-4 py-2 border rounded-md w-full shadow-s"
+          className= "mb-4 px-4 py-2 border rounded-md w-full shadow-sm"
           type="text"
           required
           placeholder="First Name"
@@ -44,7 +44,7 @@ export const Signup = () => {
           onChange={(e) => setFirstName(e.target.value)}
         />
         <input
-          className= "mb-4 px-4 py-2 border rounded-md w-full shadow-s"
+          className= "mb-4 px-4 py-2 border rounded-md w-full shadow-sm"
           type="text"
           required
           placeholder="Last Name"
@@ -52,7 +52,7 @@ export const Signup = () => {
           onChange={(e) => setLastName(e.target.value)}
         />
         <input
-          className= "mb-4 px-4 py-2 border rounded-md w-full shadow-s"
+          className= "mb-4 px-4 py-2 border rounded-md w-full shadow-sm"
           type="text"
           required
           placeholder="Email"

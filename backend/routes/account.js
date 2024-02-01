@@ -12,12 +12,12 @@ Router.get("/balance", authMiddleware, async (req, res) => {
     });
     if(requiredAccount){
         const balance = requiredAccount.balance;
-        res.status(200).json({
+        return res.status(200).json({
             balance : balance
         })
     }
     else{
-        res.status(411).json({
+        return res.status(411).json({
             message : "No Account found"
         })
     }
