@@ -8,6 +8,7 @@ export const Dashboard = () => {
     const [search, setSearch] = useState("");
     const [filteredUsers, setFilteredUsers] = useState([]);
 
+
     useEffect(() => {
         async function fetchData() {
             try {
@@ -26,7 +27,11 @@ export const Dashboard = () => {
     useEffect(() => {
         async function fetchUsers() {
             try{
-                const response = await axios.post(`http://localhost:3000/api/v1/user/bulk?filter=${search}`);
+                const response = await axios.post(`http://localhost:3000/api/v1/user/bulk?filter=${search}`, {}, {
+                    "headers" : {
+                        "authorization" : "Bearer " + localStorage.getItem("token")
+                    }
+                });
                 setFilteredUsers(response.data.user);
             }
             catch(err){

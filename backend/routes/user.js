@@ -6,11 +6,6 @@ const { User, Account } = require("../db/index");
 const { JWT_SECRET } = require("../config");
 const authMiddleware = require("../middlewares/middleware");
 
-Router.get("/", (req, res) => {
-    res.json({
-        message : "yo"
-    });
-});
 
 Router.post("/signup", async (req, res) => {
     // console.log(req.body);
@@ -109,7 +104,8 @@ Router.post("/", authMiddleware, async (req, res) => {
     })
 });
 
-Router.post("/bulk", async(req, res) => {
+Router.post("/bulk", authMiddleware, async(req, res) => {
+    const userId = req.userId;
     const name = req.query.filter || "";
     const users = await User.find({
         $or : [{
@@ -118,8 +114,11 @@ Router.post("/bulk", async(req, res) => {
             lastName : new RegExp(name, 'i')
         }]
     });
-    res.json({
-        user : users.map(user => ({
+
+    return res.json({
+        user : users
+        .filter(user => user._id != userId)
+        .map(user => ({
             username : user.username,
             firstName : user.firstName,
             lastName : user.lastName,

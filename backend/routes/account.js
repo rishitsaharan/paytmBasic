@@ -26,7 +26,6 @@ Router.get("/balance", authMiddleware, async (req, res) => {
 Router.post("/transfer", authMiddleware, async(req, res) => {
     const from = req.userId;
     const {to, amount} = req.body;
-
     const session = await mongoose.startSession();
     try{
         await session.withTransaction(async() => {
@@ -36,14 +35,13 @@ Router.post("/transfer", authMiddleware, async(req, res) => {
                     message : "Insufficient Funds"
                 });
             }
-            
             const toUser = await Account.findOne({ userID : to});
             if(!toUser){
                 return res.status(400).json({
                     message : "Invalid User"
                 });
             }
-
+            
             await Account.updateOne({
                 userID : from
             }, {
@@ -55,8 +53,7 @@ Router.post("/transfer", authMiddleware, async(req, res) => {
             }, {
                 $inc : {balance : amount}
             });
-
-            res.status(200).json({
+            return res.status(200).json({
                 message: "Transfer successful"
             })
         })
