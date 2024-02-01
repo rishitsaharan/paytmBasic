@@ -1,14 +1,19 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { Filter } from "../Components/Filter";
+import { useNavigate } from "react-router-dom";
 
 export const Dashboard = () => {
+    const navigate = useNavigate();
     const token = localStorage.getItem("token");
     const [balance, setBalance] = useState(0);
     const [search, setSearch] = useState("");
     const [filteredUsers, setFilteredUsers] = useState([]);
 
-
+    const handleLogout = () => {
+        navigate("/signin");
+        localStorage.clear();
+    }
     useEffect(() => {
         async function fetchData() {
             try {
@@ -45,7 +50,7 @@ export const Dashboard = () => {
         <div>
             <div className="w-full p-10 flex justify-between ">
                 <h1 className="text-4xl font-bold">Payments App</h1>
-                <div>
+                <div onClick={handleLogout} className="cursor-pointer">
                     <h3>Hello, User</h3>
                 </div>
             </div>
