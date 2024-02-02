@@ -1,5 +1,6 @@
 const e = require("express");
 const mongoose = require("mongoose");
+const argon2 = require("argon2");
 
 mongoose.connect("mongodb+srv://rishitsaharan:Mehnakhera%401@cluster0.hzwsqmp.mongodb.net/PaytmBasic");
 
@@ -41,6 +42,14 @@ const AccountSchema = new mongoose.Schema({
         required : true
     }
 });
+
+UserSchema.methods.createHash = async function (password) {
+    return await argon2.hash(password);
+}
+
+UserSchema.methods.validatePassword = async function(password) {
+    return await argon2.verify(this.password, password);
+}
 
 const User = mongoose.model("User", UserSchema);
 const Account = mongoose.model("Account", AccountSchema);

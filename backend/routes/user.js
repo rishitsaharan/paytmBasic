@@ -31,12 +31,15 @@ Router.post("/signup", async (req, res) => {
             message: "Email already taken/Incorrect inputs"
         });
     }else{
-        const newUser = await User.create({
+        const newUser = new User({
             username : username,
-            password : password,
             firstName : firstName,
             lastName : lastName
         });
+        const passwordHash = await newUser.createHash(password);
+        newUser.password = passwordHash;
+        await newUser.save();
+
         const newUserId = newUser._id;
         const newAccount = await Account.create({
             userID : newUserId,
@@ -65,21 +68,28 @@ Router.post("/signin", async (req, res) => {
     }
 
     const existingUser = await User.findOne({
-        username : username,
-        password : password
+        username : username
     });
-    if(existingUser){
-        const userId = existingUser._id;
-        const jwtToken = jwt.sign({userId : userId}, JWT_SECRET);
-        return res.status(200).json({
-            message : "User signed in",
-            token : jwtToken
-        });
-    }
-    else{
+    if(existingUser == null){
         return res.status(411).json({
             message: "Error while logging in"
         })
+    }
+    else{
+        if(await existingUser.validatePassword(password)){
+            const userId = existingUser._id;
+            const jwtToken = jwt.sign({userId : userId}, JWT_SECRET);
+            return res.status(200).json({
+                message : "User signed in",
+                token : jwtToken
+            });
+        }
+        else{
+            console.log("error");
+            return res.status(411).json({
+                message: "Error while logging in"
+            })
+        }
     }
 });
 
